@@ -1,0 +1,19 @@
+{
+  "name": "react-native-skyway",
+  "version": "1.0.0",
+  "description": "React Native plugin for SkyWay",
+  "homepage": "https://github.com/micin-jp/react-native-skyway",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "author": "",
+  "license": "",
+  "peerDependencies": {
+    "react": "^16.0.0-alpha",
+    "react-native": ">=0.46.0"
+  }
+}
