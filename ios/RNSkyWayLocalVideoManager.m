@@ -54,7 +54,7 @@
 
 @implementation RNSkyWayLocalVideoManager
 
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(SkyWayLocalView)
 
 - (UIView *)view
 {

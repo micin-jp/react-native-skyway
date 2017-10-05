@@ -8,7 +8,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 public class SkyWayRemoteVideoManager extends SimpleViewManager<SkyWayRemoteVideo> {
 
-  private static final String REACT_CLASS = "RNSkyWayRemoteVideo";
+  private static final String REACT_CLASS = "SkyWayRemoteVideo";
   private ThemedReactContext mContext;
 
   @Override

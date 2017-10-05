@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 
 
-export const RNLocalVideo = requireNativeComponent('RNSkyWayLocalVideo', null);
+export const LocalVideoNative = requireNativeComponent('SkyWayLocalVideo', null);
 
 export class LocalVideo extends Component {
 
@@ -13,6 +13,6 @@ export class LocalVideo extends Component {
       peerId: this.props.peer && this.props.peer.peerId,
     };
 
-    return <RNLocalVideo {...newProps} {...this.props} />;
+    return <LocalVideoNative {...newProps} {...this.props} />;
   }
 }

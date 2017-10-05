@@ -54,7 +54,7 @@
 
 @implementation RNSkyWayRemoteVideoManager
 
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(SkyWayRemoteVideo)
 
 - (UIView *)view
 {
@@ -63,7 +63,7 @@ RCT_EXPORT_MODULE()
 
 RCT_CUSTOM_VIEW_PROPERTY(peerId, NSString, RNSkyWayRemoteVideoView) {
     
-    RNSkyWayPeerManager *module = [self.bridge moduleForName:@"RNSkyWayPeerManager"];
+    RNSkyWayPeerManager *module = [self.bridge moduleForName:@"SkyWayPeerManager"];
     
     NSString* peerId = [RCTConvert NSString:json];
     RNSkyWayPeer *peer = [module peerById:peerId];

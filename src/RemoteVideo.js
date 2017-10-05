@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 
 
-export const RNRemoteVideo = requireNativeComponent('RNSkyWayRemoteVideo', null);
+export const RemoteVideoNative = requireNativeComponent('SkyWayRemoteVideo', null);
 
 export class RemoteVideo extends Component {
 
@@ -13,6 +13,6 @@ export class RemoteVideo extends Component {
       peerId: this.props.peer && this.props.peer.peerId,
     };
 
-    return <RNRemoteVideo {...newProps} {...this.props} />;
+    return <RemoteVideoNative {...newProps} {...this.props} />;
   }
 }

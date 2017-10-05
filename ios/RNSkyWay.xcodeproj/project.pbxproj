@@ -11,7 +11,6 @@
 		4204B2941F829C8F00E92E09 /* RNSkyWayPeer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4204B2931F829C8F00E92E09 /* RNSkyWayPeer.m */; };
 		4204B2B91F8484D800E92E09 /* RNSkyWayRemoteVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4204B2B81F8484D700E92E09 /* RNSkyWayRemoteVideoManager.m */; };
 		42C727871F7CE7B5009E1C5F /* RNSkyWayLocalVideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 42C727861F7CE7B5009E1C5F /* RNSkyWayLocalVideoManager.m */; };
-		B3E7B58A1CC2AC0600A0062D /* RNSkyWay.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNSkyWay.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,8 +36,6 @@
 		4204B2B81F8484D700E92E09 /* RNSkyWayRemoteVideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSkyWayRemoteVideoManager.m; sourceTree = "<group>"; };
 		42C727861F7CE7B5009E1C5F /* RNSkyWayLocalVideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSkyWayLocalVideoManager.m; sourceTree = "<group>"; };
 		42C727881F7CE7C9009E1C5F /* RNSkyWayLocalVideoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNSkyWayLocalVideoManager.h; sourceTree = "<group>"; };
-		B3E7B5881CC2AC0600A0062D /* RNSkyWay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNSkyWay.h; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* RNSkyWay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNSkyWay.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,8 +69,6 @@
 				42C727861F7CE7B5009E1C5F /* RNSkyWayLocalVideoManager.m */,
 				4204B2B71F8484C100E92E09 /* RNSkyWayRemoteVideoManager.h */,
 				4204B2B81F8484D700E92E09 /* RNSkyWayRemoteVideoManager.m */,
-				B3E7B5881CC2AC0600A0062D /* RNSkyWay.h */,
-				B3E7B5891CC2AC0600A0062D /* RNSkyWay.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -138,7 +133,6 @@
 				42C727871F7CE7B5009E1C5F /* RNSkyWayLocalVideoManager.m in Sources */,
 				4204B2B91F8484D800E92E09 /* RNSkyWayRemoteVideoManager.m in Sources */,
 				4204B2941F829C8F00E92E09 /* RNSkyWayPeer.m in Sources */,
-				B3E7B58A1CC2AC0600A0062D /* RNSkyWay.m in Sources */,
 				4204B2921F7E75A500E92E09 /* RNSkyWayPeerManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

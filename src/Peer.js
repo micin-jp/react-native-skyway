@@ -2,8 +2,8 @@ import {NativeEventEmitter, NativeModules} from 'react-native';
 import EventTarget from 'event-target-shim';
 
 
-const {RNSkyWayPeerManager} = NativeModules;
-const skyWayPeerEventEmitter = new NativeEventEmitter(RNSkyWayPeerManager);
+const {SkyWayPeerManager} = NativeModules;
+const skyWayPeerEventEmitter = new NativeEventEmitter(SkyWayPeerManager);
 
 const PeerStatus = {
   Disconnected: 0,
@@ -62,33 +62,33 @@ export class Peer extends EventTarget {
   }
 
   init() {
-    RNSkyWayPeerManager.create(this._peerId, this._options);
+    SkyWayPeerManager.create(this._peerId, this._options, this._constraints);
     this.listen();
   }
 
   dispose() {
-    RNSkyWayPeerManager.dispose(this._peerId);
+    SkyWayPeerManager.dispose(this._peerId);
     this.unlisten();
 
     this.disposed = true;
   }
 
   listen() {
-    skyWayPeerEventEmitter.addListener('RNSkyWayPeerOpen', this.onPeerOpen);
-    skyWayPeerEventEmitter.addListener('RNSkyWayPeerCall', this.onPeerCall);
-    skyWayPeerEventEmitter.addListener('RNSkyWayPeerClose', this.onPeerClose);
-    skyWayPeerEventEmitter.addListener('RNSkyWayPeerDisconnected', this.onPeerDisconnected);
-    skyWayPeerEventEmitter.addListener('RNSkyWayPeerError', this.onPeerError);
-    skyWayPeerEventEmitter.addListener('RNSkyWayMediaConnection', this.onMediaConnection);
+    skyWayPeerEventEmitter.addListener('SkyWayPeerOpen', this.onPeerOpen);
+    skyWayPeerEventEmitter.addListener('SkyWayPeerCall', this.onPeerCall);
+    skyWayPeerEventEmitter.addListener('SkyWayPeerClose', this.onPeerClose);
+    skyWayPeerEventEmitter.addListener('SkyWayPeerDisconnected', this.onPeerDisconnected);
+    skyWayPeerEventEmitter.addListener('SkyWayPeerError', this.onPeerError);
+    skyWayPeerEventEmitter.addListener('SkyWayMediaConnection', this.onMediaConnection);
   }
 
   unlisten() {
-    skyWayPeerEventEmitter.removeListener('RNSkyWayPeerOpen', this.onPeerOpen);
-    skyWayPeerEventEmitter.removeListener('RNSkyWayPeerCall', this.onPeerCall);
-    skyWayPeerEventEmitter.removeListener('RNSkyWayPeerClose', this.onPeerClose);
-    skyWayPeerEventEmitter.removeListener('RNSkyWayPeerDisconnected', this.onPeerDisconnected);
-    skyWayPeerEventEmitter.removeListener('RNSkyWayPeerError', this.onPeerError);
-    skyWayPeerEventEmitter.removeListener('RNSkyWayMediaConnection', this.onMediaConnection);
+    skyWayPeerEventEmitter.removeListener('SkyWayPeerOpen', this.onPeerOpen);
+    skyWayPeerEventEmitter.removeListener('SkyWayPeerCall', this.onPeerCall);
+    skyWayPeerEventEmitter.removeListener('SkyWayPeerClose', this.onPeerClose);
+    skyWayPeerEventEmitter.removeListener('SkyWayPeerDisconnected', this.onPeerDisconnected);
+    skyWayPeerEventEmitter.removeListener('SkyWayPeerError', this.onPeerError);
+    skyWayPeerEventEmitter.removeListener('SkyWayMediaConnection', this.onMediaConnection);
   }
 
   connect() {
@@ -96,7 +96,7 @@ export class Peer extends EventTarget {
       return;
     }
 
-    RNSkyWayPeerManager.connect(this.peerId);
+    SkyWayPeerManager.connect(this.peerId);
   }
 
   disconnect() {
@@ -104,14 +104,14 @@ export class Peer extends EventTarget {
       return;
     }
 
-    RNSkyWayPeerManager.disconnect(this.peerId);
+    SkyWayPeerManager.disconnect(this.peerId);
   }
 
   listAllPeers(callback) {
     if (this.disposed) {
       return;
     }
-    RNSkyWayPeerManager.listAllPeers(this.peerId, callback);
+    SkyWayPeerManager.listAllPeers(this.peerId, callback);
   }
 
   call(targetPeerId) {
@@ -119,7 +119,7 @@ export class Peer extends EventTarget {
       return;
     }
 
-    RNSkyWayPeerManager.call(this.peerId, targetPeerId);
+    SkyWayPeerManager.call(this.peerId, targetPeerId);
   }
 
   hangup() {
@@ -127,7 +127,7 @@ export class Peer extends EventTarget {
       return;
     }
 
-    RNSkyWayPeerManager.hangup(this.peerId);
+    SkyWayPeerManager.hangup(this.peerId);
   }
 
   onPeerOpen(payload) {
