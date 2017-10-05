@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package jp.micin.react.skyway;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import com.facebook.react.bridge.JavaScriptModule;
 public class RNSkyWayPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNSkyWayModule(reactContext));
+      return Arrays.<NativeModule>asList(new SkyWayPeerManagerModule(reactContext));
     }
 
     // Deprecated from RN 0.47
@@ -23,6 +23,9 @@ public class RNSkyWayPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-      return Collections.emptyList();
+      return Arrays.<ViewManager>asList(
+        new SkyWayLocalVideoManager(),
+        new SkyWayRemoteVideoManager()
+      );
     }
 }
