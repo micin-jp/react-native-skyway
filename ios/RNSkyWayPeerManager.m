@@ -104,19 +104,19 @@ RCT_EXPORT_MODULE(SkyWayPeerManager);
              ];
 }
 
--(void)onOpen:(RNSkyWayPeer *)peer {
+-(void)onPeerOpen:(RNSkyWayPeer *)peer {
     [self sendEventWithName:@"SkyWayPeerOpen" body:@{@"peer": @{@"id": peer.peer.identity}}];
 }
--(void)onCall:(RNSkyWayPeer *)peer {
+-(void)onPeerCall:(RNSkyWayPeer *)peer {
     [self sendEventWithName:@"SkyWayPeerCall" body:@{@"peer": @{@"id": peer.peer.identity}}];
 }
--(void)onClose:(RNSkyWayPeer *)peer {
+-(void)onPeerClose:(RNSkyWayPeer *)peer {
     [self sendEventWithName:@"SkyWayPeerClose" body:@{@"peer": @{@"id": peer.peer.identity}}];
 }
--(void)onDisconnected:(RNSkyWayPeer *)peer {
+-(void)onPeerDisconnected:(RNSkyWayPeer *)peer {
     [self sendEventWithName:@"SkyWayPeerDisconnected" body:@{@"peer": @{@"id": peer.peer.identity}}];
 }
--(void)onError:(RNSkyWayPeer *)peer {
+-(void)onPeerError:(RNSkyWayPeer *)peer {
     [self sendEventWithName:@"SkyWayPeerError" body:@{@"peer": @{@"id": peer.peer.identity}}];
 }
 -(void)onMediaConnection:(RNSkyWayPeer *)peer {

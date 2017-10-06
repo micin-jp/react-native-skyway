@@ -99,20 +99,20 @@
         NSLog(@"RNSkyWayPeerManager open");
             
         self.peerStatus = RNSkyWayPeerConnected;
-        [self notifyOpenDelegate];
+        [self notifyPeerOpenDelegate];
     }];
 
     [self.peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager close");
 
         self.peerStatus = RNSkyWayPeerDisconnected;
-        [self notifyCloseDelegate];
+        [self notifyPeerCloseDelegate];
     }];
     
     [self.peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager disconnected");
 
-        [self notifyDisconnectedDelegate];
+        [self notifyPeerDisconnectedDelegate];
     }];
 
 
@@ -122,7 +122,7 @@
         SKWPeerError* error = (SKWPeerError*)obj;
         NSLog(@"%@",error);
         
-        [self notifyErrorDelegate];
+        [self notifyPeerErrorDelegate];
     }];
     
     [self.peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* obj) {
@@ -137,7 +137,7 @@
             [self setMediaCallbacks];
             [self.mediaConnection answer:self.localStream];
             
-            [self notifyCallDelegate];
+            [self notifyPeerCallDelegate];
         }
     }];
 }
@@ -181,6 +181,8 @@
     [self closeLocalStream];
     [SKWNavigator initialize:self.peer];
     self.localStream = [SKWNavigator getUserMedia:self.constraints];
+    
+    [self notifyLocalStreamOpenDelegate];
 }
 
 - (void) closeLocalStream {
@@ -188,7 +190,7 @@
         return;
     }
     
-    // TODO: dispose local video view?
+    [self notifyLocalStreamWillCloseDelegate];
     
     [self.localStream close];
     self.localStream = nil;
@@ -199,8 +201,8 @@
         return;
     }
     
-    // TODO: dispose remote video view?
-    
+    [self notifyRemoteStreamWillCloseDelegate];
+
     [self.remoteStream close];
     self.remoteStream = nil;
 }
@@ -231,6 +233,7 @@
             self.remoteStream = (SKWMediaStream *)obj;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self notifyMediaConnectionDelegate];
+                [self notifyRemoteStreamOpenDelegate];
             });
             
         }
@@ -272,51 +275,91 @@
     [self.delegates removeObject: delegate];
 }
 
-- (void) notifyOpenDelegate {
+- (void) notifyPeerOpenDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onOpen:)]) {
-                [delegete onOpen:self];
+            if ([delegete respondsToSelector:@selector(onPeerOpen:)]) {
+                [delegete onPeerOpen:self];
             }
         }
     }
 }
 
-- (void) notifyCallDelegate {
+- (void) notifyPeerCallDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onCall:)]) {
-                [delegete onCall:self];
+            if ([delegete respondsToSelector:@selector(onPeerCall:)]) {
+                [delegete onPeerCall:self];
             }
         }
     }
 }
 
-- (void) notifyCloseDelegate {
+- (void) notifyPeerCloseDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onClose:)]) {
-                [delegete onClose:self];
+            if ([delegete respondsToSelector:@selector(onPeerClose:)]) {
+                [delegete onPeerClose:self];
             }
         }
     }
 }
 
-- (void) notifyDisconnectedDelegate {
+- (void) notifyPeerDisconnectedDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onDisconnected:)]) {
-                [delegete onDisconnected:self];
+            if ([delegete respondsToSelector:@selector(onPeerDisconnected:)]) {
+                [delegete onPeerDisconnected:self];
             }
         }
     }
 }
 
-- (void) notifyErrorDelegate {
+- (void) notifyPeerErrorDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onError:)]) {
-                [delegete onError:self];
+            if ([delegete respondsToSelector:@selector(onPeerError:)]) {
+                [delegete onPeerError:self];
+            }
+        }
+    }
+}
+
+- (void) notifyLocalStreamOpenDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onLocalStreamOpen:)]) {
+                [delegete onLocalStreamOpen:self];
+            }
+        }
+    }
+}
+
+- (void) notifyLocalStreamWillCloseDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onLocalStreamWillClose:)]) {
+                [delegete onLocalStreamWillClose:self];
+            }
+        }
+    }
+}
+
+- (void) notifyRemoteStreamOpenDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onRemoteStreamOpen:)]) {
+                [delegete onRemoteStreamOpen:self];
+            }
+        }
+    }
+}
+
+- (void) notifyRemoteStreamWillCloseDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onRemoteStreamWillClose:)]) {
+                [delegete onRemoteStreamWillClose:self];
             }
         }
     }

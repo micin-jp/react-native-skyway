@@ -152,6 +152,15 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   }
 
   @Override
+  public void onLocalStreamOpen(SkyWayPeer peer) {}
+  @Override
+  public void onLocalStreamWillClose(SkyWayPeer peer) {}
+  @Override
+  public void onRemoteStreamOpen(SkyWayPeer peer) {}
+  @Override
+  public void onRemoteStreamWillClose(SkyWayPeer peer) {}
+
+  @Override
   public void onMediaConnection(SkyWayPeer peer) {
     WritableMap peerParam = Arguments.createMap();
     peerParam.putString("id", peer.getPeer().identity());

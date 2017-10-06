@@ -5,6 +5,7 @@
 @interface RNSkyWayRemoteVideoView : UIView <RNSkyWayPeerDelegate>
 @property (nonatomic, strong) RNSkyWayPeer *peer;
 @property (nonatomic, strong) SKWVideo *remoteView;
+@property (nonatomic, assign) BOOL rendering;
 @end
 
 @implementation RNSkyWayRemoteVideoView
@@ -12,6 +13,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         _remoteView = [[SKWVideo alloc] init];
+        _rendering = NO;
         [self addSubview:_remoteView];
     }
     return self;
@@ -20,13 +22,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     self.remoteView.frame = self.bounds;
-    
-    if (self.peer != nil) {
-        if (self.peer.peerStatus == RNSkyWayPeerConnected) {
-            [self.peer.remoteStream removeVideoRenderer:self.remoteView track:0];
-            [self.peer.remoteStream addVideoRenderer:self.remoteView track:0];
-        }
-    }
+    [self addRendererIfCan];
 }
 
 - (void)setPeer:(RNSkyWayPeer *)peer {
@@ -34,6 +30,8 @@
     if (oldPeer != peer) {
         if (oldPeer) {
             [oldPeer.remoteStream removeVideoRenderer:_remoteView track:0];
+            [oldPeer removeDelegate:self];
+            _rendering = NO;
         }
         
         _peer = peer;
@@ -43,9 +41,22 @@
     }
 }
 
--(void)onMediaConnection:(RNSkyWayPeer *)peer {
+-(void)addRendererIfCan {
+    if (self.peer != nil) {
+        if (self.peer.remoteStream != nil && !self.rendering) {
+            [self.peer.remoteStream addVideoRenderer:self.remoteView track:0];
+            _rendering = YES;
+        }
+    }
+}
+
+-(void)onRemoteStreamOpen:(RNSkyWayPeer *)peer {
+    [self addRendererIfCan];
+}
+
+-(void)onRemoteStreamWillClose:(RNSkyWayPeer *)peer {
     [self.peer.remoteStream removeVideoRenderer:self.remoteView track:0];
-    [self.peer.remoteStream addVideoRenderer:self.remoteView track:0];
+    _rendering = NO;
 }
 
 @end

@@ -10,12 +10,15 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
 
   private SkyWayPeer peer;
   private Canvas canvas;
+  private boolean rendering;
 
   public SkyWayLocalVideo(Context context) {
     super(context);
 
     canvas = new Canvas(context);
     addView(canvas);
+
+    rendering = false;
   }
 
   public void setPeer(SkyWayPeer peer) {
@@ -24,6 +27,7 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
       if (oldPeer != null ) {
         if (oldPeer.getLocalStream() != null) {
           oldPeer.getLocalStream().removeVideoRenderer(canvas, 0);
+          rendering = false;
         }
         oldPeer.removeObserver(this);
       }
@@ -31,9 +35,7 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
       this.peer = peer;
       this.peer.addObserver(this);
 
-      if (this.peer.getLocalStream() != null) {
-        this.peer.getLocalStream().addVideoRenderer(canvas, 0);
-      }
+      addRendererIfCan();
     }
   }
 
@@ -42,6 +44,7 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
     if (peer != null ) {
       if (peer.getLocalStream() != null) {
         peer.getLocalStream().removeVideoRenderer(canvas, 0);
+        rendering = false;
       }
       peer.removeObserver(this);
     }
@@ -64,11 +67,23 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
   }
 
   @Override
-  public void onPeerOpen(SkyWayPeer peer) {
-    if (this.peer.getLocalStream() != null) {
-      //this.peer.getLocalStream().removeVideoRenderer(canvas, 0);
-      this.peer.getLocalStream().addVideoRenderer(canvas, 0);
-      relayout();
+  public void onLocalStreamOpen(SkyWayPeer peer) {
+    addRendererIfCan();
+    relayout();
+  }
+
+  @Override
+  public void onLocalStreamWillClose(SkyWayPeer _peer) {
+    if (peer != null && peer.getLocalStream() != null) {
+      peer.getLocalStream().removeVideoRenderer(canvas, 0);
+      rendering = false;
+    }
+  }
+
+  private void addRendererIfCan() {
+    if (!rendering && peer != null && peer.getLocalStream() != null) {
+      peer.getLocalStream().addVideoRenderer(canvas, 0);
+      rendering = true;
     }
   }
 
@@ -79,7 +94,8 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
     layout(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
   }
 
-
+  @Override
+  public void onPeerOpen(SkyWayPeer peer) {}
   @Override
   public void onPeerCall(SkyWayPeer peer) {}
   @Override
@@ -88,6 +104,11 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
   public void onPeerDisconnected(SkyWayPeer peer) {}
   @Override
   public void onPeerError(SkyWayPeer peer) {}
+
+  @Override
+  public void onRemoteStreamOpen(SkyWayPeer peer) {}
+  @Override
+  public void onRemoteStreamWillClose(SkyWayPeer peer) {}
 
   @Override
   public void onMediaConnection(SkyWayPeer peer) {}

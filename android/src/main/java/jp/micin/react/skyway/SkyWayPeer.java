@@ -318,6 +318,8 @@ public class SkyWayPeer {
     closeLocalStream();
     Navigator.initialize(peer);
     localStream = Navigator.getUserMedia(constraints);
+
+    notifyOnLocalStreamOpen();
   }
 
 
@@ -325,6 +327,8 @@ public class SkyWayPeer {
     if (localStream == null) {
       return;
     }
+
+    notifyOnLocalStreamWillClose();
 
     localStream.close();
     localStream = null;
@@ -334,6 +338,8 @@ public class SkyWayPeer {
     if (remoteStream == null) {
       return;
     }
+
+    notifyOnRemoteStreamWillClose();
 
     remoteStream.close();
     remoteStream = null;
@@ -362,6 +368,7 @@ public class SkyWayPeer {
 
         setMediaConnectionStatus(SkyWayMediaConnectionStatus.Connected);
         notifyOnMediaConnection();
+        notifyOnRemoteStreamOpen();
       }
     });
 
@@ -444,6 +451,30 @@ public class SkyWayPeer {
   private void notifyOnPeerError() {
     for (SkyWayPeerObserver observer: observers) {
       observer.onPeerError(this);
+    }
+  }
+
+  private void notifyOnLocalStreamOpen() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onLocalStreamOpen(this);
+    }
+  }
+
+  private void notifyOnLocalStreamWillClose() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onLocalStreamWillClose(this);
+    }
+  }
+
+  private void notifyOnRemoteStreamOpen() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onRemoteStreamOpen(this);
+    }
+  }
+
+  private void notifyOnRemoteStreamWillClose() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onRemoteStreamWillClose(this);
     }
   }
 
