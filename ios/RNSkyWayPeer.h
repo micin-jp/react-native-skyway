@@ -1,12 +1,3 @@
-//
-//  RNSkyWayPeer.h
-//  RNSkyWay
-//
-//  Created by Daichi Sakai on 2017/10/03.
-//  Copyright © 2017年 Micin. All rights reserved.
-//
-
-
 #ifndef RNSkyWayPeer_h
 #define RNSkyWayPeer_h
 
@@ -28,7 +19,9 @@ typedef NS_ENUM (NSUInteger, RNSkyWayMediaConnectionStatus) {
 @interface RNSkyWayPeer : NSObject
 
 @property (nonatomic, strong) NSString *peerId;
-@property (nonatomic, strong) NSDictionary *options;
+@property (nonatomic, strong) SKWPeerOption *options;
+@property (nonatomic, strong) SKWMediaConstraints *constraints;
+
 
 @property (nonatomic, strong) SKWPeer *peer;
 @property (nonatomic, strong) SKWMediaStream *localStream;
@@ -39,8 +32,8 @@ typedef NS_ENUM (NSUInteger, RNSkyWayMediaConnectionStatus) {
 
 @property (nonatomic, strong) NSHashTable *delegates;
 
-
-- (instancetype) initWithPeerId:(NSString *)peerId options: (NSDictionary *)options;
+- (instancetype) init __attribute__((unavailable("init is not available")));
+- (instancetype) initWithPeerId:(NSString *)peerId options: (NSDictionary *)options constraints: (NSDictionary *)constraints;
 - (void) connect;
 - (void) disconnect;
 - (void) listAllPeers: (RCTResponseSenderBlock) callback;

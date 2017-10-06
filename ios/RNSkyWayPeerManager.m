@@ -26,11 +26,12 @@
 
 
 RCT_EXPORT_METHOD(create:(nonnull NSString *)peerId
-                  options:(NSDictionary *)options)
+                  options:(NSDictionary *)options
+                  constraints:(NSDictionary *)constraints)
 {
     NSLog(@"RNSkyWayPeerManager create");
     
-    RNSkyWayPeer *peer = [[RNSkyWayPeer alloc] initWithPeerId:peerId options:options];
+    RNSkyWayPeer *peer = [[RNSkyWayPeer alloc] initWithPeerId:peerId options:options constraints:constraints];
     self.peers[peerId] = peer;
     [peer addDelegate:self];
 }

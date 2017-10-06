@@ -30,9 +30,11 @@ public class SkyWayPeer {
 
   static final String TAG = SkyWayPeer.class.getCanonicalName();
 
-  private String peerId;
-  private ReadableMap options;
   private Context context;
+
+  private String peerId;
+  private PeerOption options;
+  private MediaConstraints constraints;
 
   private Peer peer;
   private MediaStream	localStream;
@@ -90,14 +92,86 @@ public class SkyWayPeer {
   }
 
 
-
-  public SkyWayPeer(Context context, String peerId, ReadableMap options) {
+  public SkyWayPeer(Context context, String peerId, ReadableMap options, ReadableMap constraints) {
     this.context = context;
     this.peerId = peerId;
-    this.options = options;
+    this.options = convertOptionsFromMap(options);
+    this.constraints = convertConstraintsFromMap(constraints);
 
     this.observers = new ArrayList<SkyWayPeerObserver>();
   }
+
+  private PeerOption convertOptionsFromMap(ReadableMap map) {
+    PeerOption options = new PeerOption();
+
+    if (map.hasKey("key")) {
+      options.key = map.getString("key");
+    }
+    if (map.hasKey("domain")) {
+      options.domain = map.getString("domain");
+    }
+    if (map.hasKey("host")) {
+      options.host = map.getString("host");
+    }
+    if (map.hasKey("port")) {
+      options.port = map.getInt("port");
+    }
+    if (map.hasKey("secure")) {
+      options.secure = map.getBoolean("secure");
+    }
+    if (map.hasKey("turn")) {
+      options.turn = map.getBoolean("turn");
+    }
+
+    // TODO: support `config`
+
+    return options;
+  }
+
+
+  private MediaConstraints convertConstraintsFromMap(ReadableMap map) {
+    MediaConstraints constraints = new MediaConstraints();
+
+    if (map.hasKey("videoFlag")) {
+      constraints.videoFlag = map.getBoolean("videoFlag");
+    }
+    if (map.hasKey("audioFlag")) {
+      constraints.audioFlag = map.getBoolean("audioFlag");
+    }
+
+    if (map.hasKey("cameraPosition")) {
+      int ipos = map.getInt("cameraPosition");
+      MediaConstraints.CameraPositionEnum pos = MediaConstraints.CameraPositionEnum.UNSPECIFIED;
+      if (ipos == 1) {
+        pos = MediaConstraints.CameraPositionEnum.BACK;
+      }
+      if (ipos == 1) {
+        pos = MediaConstraints.CameraPositionEnum.FRONT;
+      }
+      constraints.cameraPosition = pos;
+    }
+    if (map.hasKey("maxWidth")) {
+      constraints.maxWidth = map.getInt("maxWidth");
+    }
+    if (map.hasKey("minWidth")) {
+      constraints.minWidth = map.getInt("minWidth");
+    }
+    if (map.hasKey("maxHeight")) {
+      constraints.maxHeight = map.getInt("maxHeight");
+    }
+    if (map.hasKey("minHeight")) {
+      constraints.minHeight = map.getInt("minHeight");
+    }
+    if (map.hasKey("maxFrameRate")) {
+      constraints.maxFrameRate = map.getInt("maxFrameRate");
+    }
+    if (map.hasKey("minFrameRate")) {
+      constraints.minFrameRate = map.getInt("minFrameRate");
+    }
+
+    return constraints;
+  }
+
 
   public void dispose() {
     disconnect();
@@ -107,24 +181,11 @@ public class SkyWayPeer {
   public void connect() {
     disconnect();
 
-    PeerOption option = new PeerOption();
-    option.key = options.getString("key");
-    option.domain = options.getString("domain");
-    option.debug = Peer.DebugLevelEnum.ALL_LOGS;
-
-    peer = new Peer(context, peerId, option);
+    peer = new Peer(context, peerId, this.options);
     peer.on(Peer.PeerEventEnum.OPEN, new OnCallback() {
       @Override
       public void onCallback(Object object) {
         Log.d(TAG, "Peer OnOpen");
-
-        MediaConstraints constraints = new MediaConstraints();
-        constraints.maxWidth = 960;
-        constraints.maxHeight = 540;
-        constraints.cameraPosition = MediaConstraints.CameraPositionEnum.FRONT;
-
-        Navigator.initialize(peer);
-        localStream = Navigator.getUserMedia(constraints);
 
         setPeerStatus(SkyWayPeerStatus.Connected);
         notifyOnPeerOpen();
@@ -167,6 +228,10 @@ public class SkyWayPeer {
 
         if (!(object instanceof MediaConnection)) {
           return;
+        }
+
+        if (localStream == null) {
+          openLocalStream();
         }
 
         mediaConnection = (MediaConnection) object;
@@ -227,11 +292,11 @@ public class SkyWayPeer {
     if (peer == null) {
       return;
     }
-    if (localStream == null) {
-      return;
-    }
 
     hangup();
+    if (localStream == null) {
+      openLocalStream();
+    }
 
     CallOption option = new CallOption();
     mediaConnection = peer.call(targetPeerId, localStream, option);
@@ -243,6 +308,16 @@ public class SkyWayPeer {
   public void hangup() {
     closeRemoteStream();
     closeMediaConnection();
+  }
+
+  private void openLocalStream() {
+    if (peer == null) {
+      return;
+    }
+
+    closeLocalStream();
+    Navigator.initialize(peer);
+    localStream = Navigator.getUserMedia(constraints);
   }
 
 

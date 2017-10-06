@@ -38,12 +38,11 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void create(String peerId, ReadableMap options) {
-    SkyWayPeer peer = new SkyWayPeer(reactContext, peerId, options);
+  public void create(String peerId, ReadableMap options, ReadableMap constraints) {
+    SkyWayPeer peer = new SkyWayPeer(reactContext, peerId, options, constraints);
     peer.addObserver(this);
 
     peers.put(peerId, peer);
-
   }
 
   @ReactMethod

@@ -1,10 +1,3 @@
-//
-//  RNSkyWayPeerDelegate.h
-//  RNSkyWay
-//
-//  Created by Daichi Sakai on 2017/10/03.
-//  Copyright © 2017年 Micin. All rights reserved.
-//
 
 #ifndef RNSkyWayPeerDelegate_h
 #define RNSkyWayPeerDelegate_h

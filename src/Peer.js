@@ -24,10 +24,8 @@ export class PeerEvent {
 
 export class Peer extends EventTarget {
 
-  constructor(peerId, options) {
+  constructor(peerId, options, constraints) {
     super();
-
-    options = options || {};
 
     this.onPeerOpen = this.onPeerOpen.bind(this);
     this.onPeerCall = this.onPeerCall.bind(this);
@@ -37,7 +35,8 @@ export class Peer extends EventTarget {
     this.onMediaConnection = this.onMediaConnection.bind(this);
 
     this._peerId = peerId;
-    this._options = options;
+    this._options = options || {};
+    this._constraints = constraints || {};
     this._peerStatus = PeerStatus.Disconnected;
     this._mediaConnectionStatus = MediaConnectionStatus.Disconnected;
     this._disposed = false;
@@ -51,6 +50,10 @@ export class Peer extends EventTarget {
 
   get options() {
     return this._options;
+  }
+
+  get constraints() {
+    return this._constraints;
   }
 
   get peerStatus() {
