@@ -2,21 +2,16 @@ package jp.micin.react.skyway;
 
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
 
 import io.skyway.Peer.Browser.Canvas;
 
-public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
+public class SkyWayLocalVideo extends Canvas implements SkyWayPeerObserver {
 
   private SkyWayPeer peer;
-  private Canvas canvas;
   private boolean rendering;
 
   public SkyWayLocalVideo(Context context) {
     super(context);
-
-    canvas = new Canvas(context);
-    addView(canvas);
 
     rendering = false;
   }
@@ -26,7 +21,7 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
     if (oldPeer != peer) {
       if (oldPeer != null ) {
         if (oldPeer.getLocalStream() != null) {
-          oldPeer.getLocalStream().removeVideoRenderer(canvas, 0);
+          oldPeer.getLocalStream().removeVideoRenderer(this, 0);
           rendering = false;
         }
         oldPeer.removeObserver(this);
@@ -43,27 +38,13 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
   protected void onDetachedFromWindow() {
     if (peer != null ) {
       if (peer.getLocalStream() != null) {
-        peer.getLocalStream().removeVideoRenderer(canvas, 0);
+        peer.getLocalStream().removeVideoRenderer(this, 0);
         rendering = false;
       }
       peer.removeObserver(this);
     }
 
     super.onDetachedFromWindow();
-  }
-
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-    final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-    setMeasuredDimension(widthSize, heightSize);
-
-    canvas.measure(widthMeasureSpec, heightMeasureSpec);
-  }
-
-  @Override
-  protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    canvas.layout(0, 0, r-l, b-t);
   }
 
   @Override
@@ -75,14 +56,14 @@ public class SkyWayLocalVideo extends ViewGroup implements SkyWayPeerObserver {
   @Override
   public void onLocalStreamWillClose(SkyWayPeer _peer) {
     if (peer != null && peer.getLocalStream() != null) {
-      peer.getLocalStream().removeVideoRenderer(canvas, 0);
+      peer.getLocalStream().removeVideoRenderer(this, 0);
       rendering = false;
     }
   }
 
   private void addRendererIfCan() {
     if (!rendering && peer != null && peer.getLocalStream() != null) {
-      peer.getLocalStream().addVideoRenderer(canvas, 0);
+      peer.getLocalStream().addVideoRenderer(this, 0);
       rendering = true;
     }
   }
