@@ -22,6 +22,7 @@ export class PeersListComponent extends Component {
     const dataSource = this.dataSource.cloneWithRows(this.props.peers);
     return (
       <View style={styles.container}>
+        <Text style={styles.title}>Connected Peers</Text>
         <ListView
           enableEmptySections={true}
           dataSource={dataSource}
@@ -51,6 +52,14 @@ export class PeersListComponent extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 10,
+    borderTopColor: '#03a9f4',
+    borderTopWidth: 1,
+  },
+  title: {
+    fontWeight: '500',
+    fontSize: 12,
+    color: '#212121'
   },
   row: {
     padding: 10,

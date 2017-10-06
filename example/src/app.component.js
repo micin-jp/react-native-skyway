@@ -107,19 +107,16 @@ export class AppComponent extends Component {
   }
 
   _renderVideoModal() {
-    //return <SkyWay.RemoteVideo style={styles.localVideo} peer={this.state.peer} />;
-    // return <SkyWay.RemoteVideo style={styles.localVideo} peer={this.state.peer} />;
+    const onClose = () => {
+      this.setState({calling: false});
+    };
     return <Modal
       animationType="slide"
       transparent={false}
       visible={this.state.calling}
-      onRequestClose={
-        () => {
-          this.setState({calling: false});
-        }
-      }
+      onRequestClose={onClose.bind(this)}
     >
-      <VideoComponent peer={this.state.peer} />
+      <VideoComponent peer={this.state.peer} onClose={onClose.bind(this)} />
     </Modal>;
   }
 
@@ -190,23 +187,25 @@ const texts = {
   STATUS_ERROR: 'Error.',
 }
 
+const STATUS_BAR_HEIGHT = 20;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    paddingTop: 20,
+    paddingTop: STATUS_BAR_HEIGHT,
   },
   statusText: {
     height: 20,
     fontSize: 12,
-    alignSelf: 'stretch',
     paddingLeft: 5,
     paddingRight: 5,
   },
   peerIdInputContainer: {
     height: 60,
+    margin: 10,
     flexDirection: 'row',
     alignSelf: 'stretch',
   },
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#bdbdbd',
     paddingLeft: 5,
     paddingRight: 5,
-    margin: 5,
+    margin: 5
   },
   peerIdInputButton: {
     width: 100,
@@ -233,9 +232,8 @@ const styles = StyleSheet.create({
   },
   peersListContainer: {
     flex: 1,
+    marginTop: 10,
     alignSelf: 'stretch',
-    paddingLeft: 5,
-    paddingRight: 5,
   },
   localVideo: {
     width: 200,
