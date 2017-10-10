@@ -105,27 +105,28 @@
 - (void)connect {
     
     self.peer = [[SKWPeer alloc] initWithId:self.peerId options:self.options];
-    
+    __weak RNSkyWayPeer *weakSelf = self;
+
     [self.peer on:SKW_PEER_EVENT_OPEN callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager open");
             
-        self.peerStatus = RNSkyWayPeerConnected;
-        [self notifyPeerOpenDelegate];
+        weakSelf.peerStatus = RNSkyWayPeerConnected;
+        [weakSelf notifyPeerOpenDelegate];
     }];
 
     [self.peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager close");
 
-        [self notifyPeerCloseDelegate];
+        [weakSelf notifyPeerCloseDelegate];
     }];
     
     [self.peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager disconnected");
 
-        [self disconnect];
+        [weakSelf disconnect];
 
-        self.peerStatus = RNSkyWayPeerDisconnected;
-        [self notifyPeerDisconnectedDelegate];
+        weakSelf.peerStatus = RNSkyWayPeerDisconnected;
+        [weakSelf notifyPeerDisconnectedDelegate];
     }];
 
 
@@ -135,17 +136,17 @@
         SKWPeerError* error = (SKWPeerError*)obj;
         NSLog(@"%@",error);
         
-        [self notifyPeerErrorDelegate];
+        [weakSelf notifyPeerErrorDelegate];
     }];
     
     [self.peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager call");
 
         if (YES == [obj isKindOfClass:[SKWMediaConnection class]]) {
-            self.mediaConnection = (SKWMediaConnection *)obj;
-            [self setMediaCallbacks];
+            weakSelf.mediaConnection = (SKWMediaConnection *)obj;
+            [weakSelf setMediaCallbacks];
             
-            [self notifyPeerCallDelegate];
+            [weakSelf notifyPeerCallDelegate];
         }
     }];
 }
@@ -252,17 +253,19 @@
         return;
     }
     
+    __weak RNSkyWayPeer *weakSelf = self;
+    
     [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_STREAM callback:^(NSObject* obj) {
         if (YES == [obj isKindOfClass:[SKWMediaStream class]]) {
-            if (self.mediaConnectionStatus == RNSkyWayMediaConnectionConnected) {
+            if (weakSelf.mediaConnectionStatus == RNSkyWayMediaConnectionConnected) {
                 return;
             }
             
-            self.mediaConnectionStatus = RNSkyWayMediaConnectionConnected;
-            self.remoteStream = (SKWMediaStream *)obj;
+            weakSelf.mediaConnectionStatus = RNSkyWayMediaConnectionConnected;
+            weakSelf.remoteStream = (SKWMediaStream *)obj;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyMediaConnectionOpenDelegate];
-                [self notifyRemoteStreamOpenDelegate];
+                [weakSelf notifyMediaConnectionOpenDelegate];
+                [weakSelf notifyRemoteStreamOpenDelegate];
             });
         }
     }];
@@ -270,13 +273,13 @@
     [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_ERROR callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager mediaConnection error");
         
-        [self notifyMediaConnectionErrorDelegate];
+        [weakSelf notifyMediaConnectionErrorDelegate];
     }];
 
     [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager mediaConnection close");
 
-        [self notifyMediaConnectionCloseDelegate];
+        [weakSelf notifyMediaConnectionCloseDelegate];
     }];
 
 }
