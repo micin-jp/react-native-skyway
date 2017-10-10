@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
+  Image,
   Text,
   TextInput,
   TouchableHighlight, 
@@ -21,12 +22,15 @@ export class AppComponent extends Component {
 
     this._onPressConnectPeer = this._onPressConnectPeer.bind(this);
     this._onSelectedPeer = this._onSelectedPeer.bind(this);
+    this._onReloadPeers = this._onReloadPeers.bind(this);
 
     this._onPeerOpen = this._onPeerOpen.bind(this);
     this._onPeerClose = this._onPeerClose.bind(this);
     this._onPeerError = this._onPeerError.bind(this);
     this._onPeerDisconnected = this._onPeerDisconnected.bind(this);
     this._onPeerCall = this._onPeerCall.bind(this);
+    this._onMediaConnectionError = this._onMediaConnectionError.bind(this);
+    this._onMediaConnectionClose = this._onMediaConnectionClose.bind(this);
 
     this.state = {
       inputPeerId: '',
@@ -66,6 +70,8 @@ export class AppComponent extends Component {
     peer.addEventListener('peer-error', this._onPeerError);
     peer.addEventListener('peer-disconnected', this._onPeerDisconnected);
     peer.addEventListener('peer-call', this._onPeerCall);
+    peer.addEventListener('media-connection-close', this._onMediaConnectionClose);
+    peer.addEventListener('media-connection-error', this._onMediaConnectionError);
 
     this.setState({ peer });
   }
@@ -74,10 +80,49 @@ export class AppComponent extends Component {
     if (this.state.peer) {
 
       const peer = this.state.peer;
+      peer.removeEventListener('peer-open', this._onPeerOpen);
+      peer.removeEventListener('peer-close', this._onPeerClose);
+      peer.removeEventListener('peer-error', this._onPeerError);
+      peer.removeEventListener('peer-disconnected', this._onPeerDisconnected);
+      peer.removeEventListener('peer-call', this._onPeerCall);
+      peer.removeEventListener('media-connection-close', this._onMediaConnectionClose);
+      peer.removeEventListener('media-connection-error', this._onMediaConnectionError);
       peer.dispose();
-
       this.setState({peer: null, otherPeers: []});
     }
+  }
+
+  _call(receiverPeerId) {
+    if (this.state.peer) {
+      this.state.peer.call(receiverPeerId);
+      this.setState({calling: true});
+    }
+  }
+
+  _hangupCall() {
+    if (this.state.peer) {
+      this.state.peer.hangup();
+      this.setState({calling: false});
+    }
+  }
+
+  _fetchPeers() {
+    if (!this.state.peer) {
+      return;
+    }
+
+    const currentPeer = this.state.peer;
+
+    this.setState({statusText: texts.STATUS_FETCHING_PEERS});
+    this.state.peer.listAllPeers((err, peers) => {
+      if (err) {
+        this.setState({statusText: texts.STATUS_ERROR});
+        return;
+      }
+
+      this.setState({statusText: texts.STATUS_CONNECTED});
+      this.setState({otherPeers: peers.filter(p => p !== currentPeer.peerId)});
+    });
   }
 
   _renderPeerIdInput() {
@@ -105,14 +150,13 @@ export class AppComponent extends Component {
 
   _renderPeersList() {
     return <View style={styles.peersListContainer} key="peers-list">
-      <PeersListComponent peers={this.state.otherPeers} onSelectedPeer={this._onSelectedPeer} />
+      <PeersListComponent peers={this.state.otherPeers} onSelectedPeer={this._onSelectedPeer} onReload={this._onReloadPeers} />
     </View>
   }
 
   _renderVideoModal() {
     const onClose = () => {
-      this.state.peer.hangup();
-      this.setState({calling: false});
+      this._hangupCall();
     };
     return <Modal
       animationType="slide"
@@ -123,7 +167,6 @@ export class AppComponent extends Component {
       <VideoComponent peer={this.state.peer} onClose={onClose.bind(this)} />
     </Modal>;
   }
-
 
   _onPressConnectPeer() {
     const peerId = this.state.inputPeerId;
@@ -138,34 +181,16 @@ export class AppComponent extends Component {
     this.setState({statusText: texts.STATUS_CONNECTING});
   }
 
-  _onSelectedPeer(targetPeerId) {
-    if (!this.state.peer) {
-      return;
-    }
+  _onReloadPeers() {
+    this._fetchPeers();
+  }
 
-    const peer = this.state.peer;
-    peer.call(targetPeerId);
-    this.setState({calling: true});
+  _onSelectedPeer(receiverPeerId) {
+    this._call(receiverPeerId);
   }
 
   _onPeerOpen() {
-    if (!this.state.peer) {
-      return;
-    }
-
-    const currentPeer = this.state.peer;
-
-    this.setState({statusText: texts.STATUS_FETCHING_PEERS});
-    this.state.peer.listAllPeers((err, peers) => {
-      if (err) {
-        console.error(err);
-        this.setState({statusText: texts.STATUS_ERROR});
-        return;
-      }
-
-      this.setState({statusText: texts.STATUS_CONNECTED});
-      this.setState({otherPeers: peers.filter(p => p !== currentPeer.peerId)});
-    });
+    this._fetchPeers();
   }
 
   _onPeerError() {
@@ -180,13 +205,20 @@ export class AppComponent extends Component {
   }
 
   _onPeerClose() {
-    this.state.peer.hangup();
-    this.setState({calling: false});
+    this._hangupCall();
   }
 
   _onPeerCall() {
     this.state.peer.answer();
     this.setState({calling: true});
+  }
+
+  _onMediaConnectionError() {
+    this._hangupCall();
+  }
+
+  _onMediaConnectionClose() {
+    this._hangupCall();
   }
 
 }
@@ -201,6 +233,8 @@ const texts = {
 }
 
 const STATUS_BAR_HEIGHT = 20;
+const TOUCH_SIZE = 48;
+const ICON_SIZE = 24;
 
 const styles = StyleSheet.create({
   container: {

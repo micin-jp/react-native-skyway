@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
+  Image,
   Text,
   View,
   TouchableHighlight,
@@ -19,10 +20,17 @@ export class PeersListComponent extends Component {
   }
 
   render() {
+    const onReload = () => {
+      this.props.onReload && this.props.onReload();
+    };
+
     const dataSource = this.dataSource.cloneWithRows(this.props.peers);
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Connected Peers</Text>
+        <TouchableHighlight underlayColor='rgba(0,0,0,0)' onPress={onReload.bind(this)} style={styles.reloadTouch}>
+          <Image source={require('./icons/ic_refresh.png')} style={styles.reloadImage} />
+        </TouchableHighlight>
         <ListView
           enableEmptySections={true}
           dataSource={dataSource}
@@ -49,6 +57,9 @@ export class PeersListComponent extends Component {
   }
 }
 
+const TOUCH_SIZE = 48;
+const ICON_SIZE = 24;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -59,7 +70,21 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '500',
     fontSize: 12,
-    color: '#212121'
+    color: '#212121',
+    height: TOUCH_SIZE,
+    width: 200,
+  },
+  reloadTouch: {
+    position: 'absolute',
+    top: 0,
+    right: 10,
+    width: TOUCH_SIZE,
+    height: TOUCH_SIZE,
+    padding: (TOUCH_SIZE - ICON_SIZE) / 2,
+  },
+  reloadImage: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
   },
   row: {
     padding: 10,
@@ -70,6 +95,6 @@ const styles = StyleSheet.create({
   seperator: {
     borderBottomWidth: 1,
     borderBottomColor: '#bdbdbd',
-  }
+  },
 
 });
