@@ -93,3 +93,13 @@ const styles = StyleSheet.create({
 });
 
 ```
+
+### Authorizing Device Access
+
+You should checking device permission(camera, microphone) before starting video call.
+
+Use [react-native-permissions](https://github.com/yonahforst/react-native-permissions)
+
+### Audio Management, Keeping Screen On
+
+Use [react-native-incall-manager](https://github.com/zxcpoiu/react-native-incall-manager).
