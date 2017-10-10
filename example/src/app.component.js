@@ -21,7 +21,9 @@ export class AppComponent extends Component {
 
     this._onPressConnectPeer = this._onPressConnectPeer.bind(this);
     this._onSelectedPeer = this._onSelectedPeer.bind(this);
+
     this._onPeerOpen = this._onPeerOpen.bind(this);
+    this._onPeerClose = this._onPeerClose.bind(this);
     this._onPeerError = this._onPeerError.bind(this);
     this._onPeerDisconnected = this._onPeerDisconnected.bind(this);
     this._onPeerCall = this._onPeerCall.bind(this);
@@ -60,6 +62,7 @@ export class AppComponent extends Component {
     const peer = new SkyWay.Peer(peerId, options)
     peer.connect();
     peer.addEventListener('peer-open', this._onPeerOpen);
+    peer.addEventListener('peer-close', this._onPeerClose);
     peer.addEventListener('peer-error', this._onPeerError);
     peer.addEventListener('peer-disconnected', this._onPeerDisconnected);
     peer.addEventListener('peer-call', this._onPeerCall);
@@ -108,6 +111,7 @@ export class AppComponent extends Component {
 
   _renderVideoModal() {
     const onClose = () => {
+      this.state.peer.hangup();
       this.setState({calling: false});
     };
     return <Modal
@@ -169,10 +173,19 @@ export class AppComponent extends Component {
   }
 
   _onPeerDisconnected() {
+    this._disposePeer();
+
+    this.setState({calling: false});
     this.setState({statusText: texts.STATUS_DISCONNECTED});
   }
 
+  _onPeerClose() {
+    this.state.peer.hangup();
+    this.setState({calling: false});
+  }
+
   _onPeerCall() {
+    this.state.peer.answer();
     this.setState({calling: true});
   }
 
