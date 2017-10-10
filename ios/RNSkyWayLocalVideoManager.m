@@ -6,7 +6,7 @@
 @property (nonatomic, strong) RNSkyWayPeer *peer;
 @property (nonatomic, strong) SKWVideo *localView;
 @property (nonatomic, assign) BOOL rendering;
-
+@property (nonatomic, assign) CGSize videoSize;
 @end
 
 @implementation RNSkyWayLocalVideoView
@@ -16,14 +16,44 @@
         _localView = [[SKWVideo alloc] init];
         _rendering = NO;
         [self addSubview:_localView];
+        [self setChangeVideoSizeCallback];
     }
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+
     self.localView.frame = self.bounds;
+    // TODO
+//    CGFloat width = _videoSize.width, height = _videoSize.height;
+//    if (width <= 0 || height <= 0) {
+//    } else { // object-fit: cover
+//        CGFloat scaleFactor = (width / self.bounds.size.width) * (self.bounds.size.height / height);
+//        if (scaleFactor >= 1) {
+//            self.localView.transform = CGAffineTransformMakeScale(scaleFactor, 1);
+//        } else {
+//            self.localView.transform = CGAffineTransformMakeScale(1, 1 / scaleFactor);
+//        }
+//    }
+    
     [self addRendererIfCan];
+}
+
+- (void)setChangeVideoSizeCallback {
+    __weak RNSkyWayLocalVideoView *weakSelf = self;
+    [_localView setDidChangeVideoSizeCallback:^(CGSize size) {
+        weakSelf.videoSize = size;
+        [weakSelf dispatchAsyncSetNeedsLayout];
+    }];
+}
+
+- (void)dispatchAsyncSetNeedsLayout {
+    __weak UIView *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *strongSelf = weakSelf;
+        [strongSelf setNeedsLayout];
+    });
 }
 
 - (void)setPeer:(RNSkyWayPeer *)peer {
@@ -70,7 +100,9 @@ RCT_EXPORT_MODULE(SkyWayLocalVideo)
 
 - (UIView *)view
 {
-    return [[RNSkyWayLocalVideoView alloc] init];
+    RNSkyWayLocalVideoView *v = [[RNSkyWayLocalVideoView alloc] init];
+    v.clipsToBounds = YES;
+    return v;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(peerId, NSString, RNSkyWayLocalVideoView) {

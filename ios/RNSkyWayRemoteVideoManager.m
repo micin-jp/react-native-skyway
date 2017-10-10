@@ -6,6 +6,7 @@
 @property (nonatomic, strong) RNSkyWayPeer *peer;
 @property (nonatomic, strong) SKWVideo *remoteView;
 @property (nonatomic, assign) BOOL rendering;
+@property (nonatomic, assign) CGSize videoSize;
 @end
 
 @implementation RNSkyWayRemoteVideoView
@@ -15,14 +16,45 @@
         _remoteView = [[SKWVideo alloc] init];
         _rendering = NO;
         [self addSubview:_remoteView];
+        [self setChangeVideoSizeCallback];
     }
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
     self.remoteView.frame = self.bounds;
+    
+    CGFloat width = _videoSize.width, height = _videoSize.height;
+    if (width <= 0 || height <= 0) {
+    } else { // object-fit: cover
+        CGFloat scaleFactor = (width / self.bounds.size.width) * (self.bounds.size.height / height);
+        if (scaleFactor >= 1) {
+            self.remoteView.transform = CGAffineTransformMakeScale(scaleFactor, 1);
+        } else {
+            self.remoteView.transform = CGAffineTransformMakeScale(1, 1 / scaleFactor);
+        }
+    }
+    //TODO: object-fit: contain
+
     [self addRendererIfCan];
+}
+
+- (void)setChangeVideoSizeCallback {
+    __weak RNSkyWayRemoteVideoView *weakSelf = self;
+    [_remoteView setDidChangeVideoSizeCallback:^(CGSize size) {
+        weakSelf.videoSize = size;
+        [weakSelf dispatchAsyncSetNeedsLayout];
+    }];
+}
+
+- (void)dispatchAsyncSetNeedsLayout {
+    __weak UIView *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *strongSelf = weakSelf;
+        [strongSelf setNeedsLayout];
+    });
 }
 
 - (void)setPeer:(RNSkyWayPeer *)peer {
@@ -69,7 +101,9 @@ RCT_EXPORT_MODULE(SkyWayRemoteVideo)
 
 - (UIView *)view
 {
-    return [[RNSkyWayRemoteVideoView alloc] init];
+    RNSkyWayRemoteVideoView *v = [[RNSkyWayRemoteVideoView alloc] init];
+    v.clipsToBounds = YES;
+    return v;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(peerId, NSString, RNSkyWayRemoteVideoView) {
