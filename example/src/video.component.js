@@ -29,8 +29,12 @@ export class VideoComponent extends Component {
           </View>
         </View>
         <View style={styles.videos}>
-          <SkyWay.RemoteVideo style={styles.remoteVideo} peer={this.props.peer} />
-          <SkyWay.LocalVideo style={styles.localVideo} peer={this.props.peer} />
+          <View style={styles.remoteVideoFrame}>
+            <SkyWay.RemoteVideo style={styles.remoteVideo} peer={this.props.peer} />
+          </View>
+          <View style={styles.localVideoFrame}>
+            <SkyWay.LocalVideo style={styles.localVideo} peer={this.props.peer} zOrderOnTop={true}/>
+          </View>
         </View>
       </View>
     );
@@ -77,18 +81,24 @@ const styles = StyleSheet.create({
   videos: {
     flex: 1,
   },
-  localVideo: {
+  localVideoFrame: {
     position: 'absolute',
     width: 100,
-    height: 160,
+    height: 100 * 1.3333,
     bottom: 10,
     right: 10,
   },
-  remoteVideo: {
+  localVideo: {
+    flex: 1,
+  },
+  remoteVideoFrame: {
     position: 'absolute',
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    height: Dimensions.get('window').height - (HEADER_HEIGHT + STATUS_BAR_HEIGHT),
     top: 0,
     left: 0,
+  },
+  remoteVideo: {
+    flex: 1,
   },
 });
