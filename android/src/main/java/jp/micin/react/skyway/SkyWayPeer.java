@@ -253,7 +253,7 @@ public class SkyWayPeer {
         peer.disconnect();
         notifyOnPeerDisconnected();
       }
-
+      peer.destroy();
       setPeerStatus(SkyWayPeerStatus.Disconnected);
     }
     peer = null;
@@ -337,6 +337,7 @@ public class SkyWayPeer {
     closeLocalStream();
     Navigator.initialize(peer);
     localStream = Navigator.getUserMedia(constraints);
+    Navigator.terminate();
 
     notifyOnLocalStreamOpen();
   }

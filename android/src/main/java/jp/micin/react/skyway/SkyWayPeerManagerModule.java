@@ -39,50 +39,67 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void create(String peerId, ReadableMap options, ReadableMap constraints) {
-    SkyWayPeer peer = new SkyWayPeer(reactContext, peerId, options, constraints);
-    peer.addObserver(this);
-
-    peers.put(peerId, peer);
-  }
-
-  @ReactMethod
-  public void dispose(String peerId) {
-    final SkyWayPeer peer = peers.get(peerId);
+  public void create(final String peerId, final ReadableMap options, final ReadableMap constraints) {
     final SkyWayPeerManagerModule self = this;
 
-    if (peer != null) {
-      UiThreadUtil.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          peer.dispose();
-          peer.removeObserver(self);
-        }
-      });
-    }
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = new SkyWayPeer(self.reactContext, peerId, options, constraints);
+        peer.addObserver(self);
+
+        self.peers.put(peerId, peer);
+      }
+    });
   }
 
   @ReactMethod
-  public void connect(String peerId) {
-    SkyWayPeer peer = peers.get(peerId);
+  public void dispose(final String peerId) {
+    final SkyWayPeerManagerModule self = this;
 
-    if (peer != null) {
-      peer.connect();
-    }
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        final SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
+        }
+
+        peer.dispose();
+        peer.removeObserver(self);
+      }
+    });
   }
 
   @ReactMethod
-  public void diconnect(String peerId) {
-    final SkyWayPeer peer = peers.get(peerId);
-
-    if (peer != null) {
-      UiThreadUtil.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          peer.disconnect();
+  public void connect(final String peerId) {
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
         }
-      });
-    }
+
+        peer.connect();
+      }
+    });
+  }
+
+  @ReactMethod
+  public void diconnect(final String peerId) {
+
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
+        }
+
+        peer.disconnect();
+      }
+    });
   }
 
   @ReactMethod
@@ -95,45 +112,48 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void call(String peerId, final String targetPeerId) {
-    final SkyWayPeer peer = peers.get(peerId);
-
-    if (peer != null) {
-      UiThreadUtil.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          peer.call(targetPeerId);
+  public void call(final String peerId, final String targetPeerId) {
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
         }
-      });
-    }
+
+        peer.call(targetPeerId);
+      }
+    });
   }
 
   @ReactMethod
-  public void answer(String peerId) {
-    final SkyWayPeer peer = peers.get(peerId);
-
-    if (peer != null) {
-      UiThreadUtil.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          peer.answer();
+  public void answer(final String peerId) {
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
         }
-      });
-    }
+
+        peer.answer();
+      }
+    });
   }
 
   @ReactMethod
-  public void hangup(String peerId) {
-    final SkyWayPeer peer = peers.get(peerId);
-
-    if (peer != null) {
-      UiThreadUtil.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          peer.hangup();
+  public void hangup(final String peerId) {
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
         }
-      });
-    }
+
+        peer.hangup();
+      }
+    });
   }
 
   @Override

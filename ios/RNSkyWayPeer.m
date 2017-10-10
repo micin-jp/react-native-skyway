@@ -155,6 +155,7 @@
             [self.peer disconnect];
             [self notifyPeerDisconnectedDelegate];
         }
+        [self.peer destroy];
     }
     self.peerStatus = RNSkyWayPeerDisconnected;
     self.peer = nil;
@@ -201,6 +202,7 @@
     [self closeLocalStream];
     [SKWNavigator initialize:self.peer];
     self.localStream = [SKWNavigator getUserMedia:self.constraints];
+    [SKWNavigator terminate];
     
     [self notifyLocalStreamOpenDelegate];
 }
