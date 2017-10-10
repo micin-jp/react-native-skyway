@@ -6,6 +6,7 @@
 @property (nonatomic, strong) RNSkyWayPeer *peer;
 @property (nonatomic, strong) SKWVideo *remoteView;
 @property (nonatomic, assign) BOOL rendering;
+@property (nonatomic, assign) BOOL layoutReady;
 @property (nonatomic, assign) CGSize videoSize;
 @end
 
@@ -15,6 +16,7 @@
     if (self = [super initWithFrame:frame]) {
         _remoteView = [[SKWVideo alloc] init];
         _rendering = NO;
+        _layoutReady = NO;
         [self addSubview:_remoteView];
         [self setChangeVideoSizeCallback];
     }
@@ -37,7 +39,8 @@
         }
     }
     //TODO: object-fit: contain
-
+    
+    self.layoutReady = YES; // [self.remoteView setNeedLayout] not working? Add renderer after layout has completed
     [self addRendererIfCan];
 }
 
@@ -69,13 +72,13 @@
         _peer = peer;
         [_peer addDelegate:self];
         
-        [self setNeedsLayout];
+        [self dispatchAsyncSetNeedsLayout];
     }
 }
 
 -(void)addRendererIfCan {
     if (self.peer != nil) {
-        if (self.peer.remoteStream != nil && !self.rendering) {
+        if (self.peer.remoteStream != nil && !self.rendering && self.layoutReady) {
             [self.peer.remoteStream addVideoRenderer:self.remoteView track:0];
             _rendering = YES;
         }

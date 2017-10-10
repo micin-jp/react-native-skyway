@@ -6,6 +6,7 @@
 @property (nonatomic, strong) RNSkyWayPeer *peer;
 @property (nonatomic, strong) SKWVideo *localView;
 @property (nonatomic, assign) BOOL rendering;
+@property (nonatomic, assign) BOOL layoutReady;
 @property (nonatomic, assign) CGSize videoSize;
 @end
 
@@ -15,6 +16,7 @@
     if (self = [super initWithFrame:frame]) {
         _localView = [[SKWVideo alloc] init];
         _rendering = NO;
+        _layoutReady = NO;
         [self addSubview:_localView];
         [self setChangeVideoSizeCallback];
     }
@@ -37,6 +39,7 @@
 //        }
 //    }
     
+    self.layoutReady = YES; // [self.localView setNeedLayout] not working? Add renderer after layout has completed
     [self addRendererIfCan];
 }
 
@@ -68,13 +71,13 @@
         _peer = peer;
         [_peer addDelegate:self];
         
-        [self setNeedsLayout];
+        [self dispatchAsyncSetNeedsLayout];
     }
 }
 
 -(void)addRendererIfCan {
     if (self.peer != nil) {
-        if (self.peer.localStream != nil && !self.rendering) {
+        if (self.peer.localStream != nil && !self.rendering && self.layoutReady) {
             [self.peer.localStream addVideoRenderer:self.localView track:0];
             _rendering = YES;
         }
