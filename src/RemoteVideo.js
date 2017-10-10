@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 
 
-export const RemoteVideoNative = requireNativeComponent('SkyWayRemoteVideo', null);
+const RemoteVideoNative = requireNativeComponent('SkyWayRemoteVideo', null);
 
 export class RemoteVideo extends Component {
 

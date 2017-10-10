@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 
 
-export const LocalVideoNative = requireNativeComponent('SkyWayLocalVideo', null);
+const LocalVideoNative = requireNativeComponent('SkyWayLocalVideo', null);
 
 export class LocalVideo extends Component {
 

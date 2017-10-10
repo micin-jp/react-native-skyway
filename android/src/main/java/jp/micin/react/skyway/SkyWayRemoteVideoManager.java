@@ -36,4 +36,15 @@ public class SkyWayRemoteVideoManager extends SimpleViewManager<SkyWayRemoteVide
     view.setPeer(peer);
   }
 
+
+  @ReactProp(name = "zOrderMediaOverlay")
+  public void setZOrderMediaOverlay(SkyWayLocalVideo view, boolean isMediaOverlay) {
+    view.setZOrderMediaOverlay(isMediaOverlay);
+  }
+
+  @ReactProp(name = "zOrderOnTop")
+  public void setZOrderOnTop(SkyWayLocalVideo view, boolean onTop) {
+    view.setZOrderOnTop(onTop);
+  }
+
 }

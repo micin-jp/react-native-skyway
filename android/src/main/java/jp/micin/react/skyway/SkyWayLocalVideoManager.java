@@ -22,7 +22,6 @@ public class SkyWayLocalVideoManager extends SimpleViewManager<SkyWayLocalVideo>
     return new SkyWayLocalVideo(context);
   }
 
-
   @ReactProp(name = "peerId")
   public void setPeerId(SkyWayLocalVideo view, String peerId) {
     SkyWayPeer peer;
@@ -34,6 +33,16 @@ public class SkyWayLocalVideoManager extends SimpleViewManager<SkyWayLocalVideo>
     }
 
     view.setPeer(peer);
+  }
+
+  @ReactProp(name = "zOrderMediaOverlay")
+  public void setZOrderMediaOverlay(SkyWayLocalVideo view, boolean isMediaOverlay) {
+    view.setZOrderMediaOverlay(isMediaOverlay);
+  }
+
+  @ReactProp(name = "zOrderOnTop")
+  public void setZOrderOnTop(SkyWayLocalVideo view, boolean onTop) {
+    view.setZOrderOnTop(onTop);
   }
 
 }
