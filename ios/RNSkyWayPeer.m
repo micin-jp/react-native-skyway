@@ -60,6 +60,13 @@
     if ([dic objectForKey:@"turn"] != nil) {
         _options.turn = [RCTConvert BOOL:dic[@"turn"]];
     }
+    if ([dic objectForKey:@"credential"] != nil) {
+        NSDictionary *creDic = [RCTConvert NSDictionary:dic[@"credential"]];
+        _options.credential = [[SKWPeerCredential alloc] init];
+        _options.credential.ttl = [RCTConvert NSUInteger:creDic[@"ttl"]];
+        _options.credential.timestamp = [RCTConvert NSUInteger:creDic[@"timestamp"]];
+        _options.credential.authToken = [RCTConvert NSString:creDic[@"authToken"]];
+    }
     // TODO: support `config`
 }
 

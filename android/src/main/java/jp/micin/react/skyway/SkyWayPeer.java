@@ -21,6 +21,7 @@ import io.skyway.Peer.CallOption;
 import io.skyway.Peer.MediaConnection;
 import io.skyway.Peer.OnCallback;
 import io.skyway.Peer.Peer;
+import io.skyway.Peer.PeerCredential;
 import io.skyway.Peer.PeerError;
 import io.skyway.Peer.PeerOption;
 
@@ -122,6 +123,13 @@ public class SkyWayPeer {
     }
     if (map.hasKey("turn")) {
       options.turn = map.getBoolean("turn");
+    }
+    if (map.hasKey("credential")) {
+      ReadableMap creMap = map.getMap("credential");
+      options.credential = new PeerCredential();
+      options.credential.ttl = creMap.getInt("ttl");
+      options.credential.timestamp = creMap.getInt("timestamp");
+      options.credential.authToken = creMap.getString("authToken");
     }
 
     // TODO: support `config`
