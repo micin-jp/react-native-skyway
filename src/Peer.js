@@ -32,7 +32,9 @@ export class Peer extends EventTarget {
     this.onPeerClose = this.onPeerClose.bind(this);
     this.onPeerDisconnected = this.onPeerDisconnected.bind(this);
     this.onPeerError = this.onPeerError.bind(this);
-    this.onMediaConnection = this.onMediaConnection.bind(this);
+    this.onMediaConnectionOpen = this.onMediaConnectionOpen.bind(this);
+    this.onMediaConnectionClose = this.onMediaConnectionClose.bind(this);
+    this.onMediaConnectionError = this.onMediaConnectionError.bind(this);
 
     this._peerId = peerId;
     this._options = options || {};
@@ -82,7 +84,9 @@ export class Peer extends EventTarget {
     skyWayPeerEventEmitter.addListener('SkyWayPeerClose', this.onPeerClose);
     skyWayPeerEventEmitter.addListener('SkyWayPeerDisconnected', this.onPeerDisconnected);
     skyWayPeerEventEmitter.addListener('SkyWayPeerError', this.onPeerError);
-    skyWayPeerEventEmitter.addListener('SkyWayMediaConnection', this.onMediaConnection);
+    skyWayPeerEventEmitter.addListener('SkyWayMediaConnectionOpen', this.onMediaConnectionOpen);
+    skyWayPeerEventEmitter.addListener('SkyWayMediaConnectionClose', this.onMediaConnectionClose);
+    skyWayPeerEventEmitter.addListener('SkyWayMediaConnectionError', this.onMediaConnectionError);
   }
 
   unlisten() {
@@ -91,7 +95,9 @@ export class Peer extends EventTarget {
     skyWayPeerEventEmitter.removeListener('SkyWayPeerClose', this.onPeerClose);
     skyWayPeerEventEmitter.removeListener('SkyWayPeerDisconnected', this.onPeerDisconnected);
     skyWayPeerEventEmitter.removeListener('SkyWayPeerError', this.onPeerError);
-    skyWayPeerEventEmitter.removeListener('SkyWayMediaConnection', this.onMediaConnection);
+    skyWayPeerEventEmitter.removeListener('SkyWayMediaConnectionOpen', this.onMediaConnectionOpen);
+    skyWayPeerEventEmitter.removeListener('SkyWayMediaConnectionClose', this.onMediaConnectionClose);
+    skyWayPeerEventEmitter.removeListener('SkyWayMediaConnectionError', this.onMediaConnectionError);
   }
 
   connect() {
@@ -123,6 +129,14 @@ export class Peer extends EventTarget {
     }
 
     SkyWayPeerManager.call(this.peerId, targetPeerId);
+  }
+
+  answer() {
+    if (this.disposed) {
+      return;
+    }
+
+    SkyWayPeerManager.answer(this.peerId);
   }
 
   hangup() {
@@ -163,9 +177,21 @@ export class Peer extends EventTarget {
     }
   }
 
-  onMediaConnection(payload) {
+  onMediaConnectionOpen(payload) {
     if (payload.peer.id === this.peerId) {
-      this.dispatchEvent(new PeerEvent('media-connection'));
+      this.dispatchEvent(new PeerEvent('media-connection-open'));
+    }
+  }
+
+  onMediaConnectionClose(payload) {
+    if (payload.peer.id === this.peerId) {
+      this.dispatchEvent(new PeerEvent('media-connection-close'));
+    }
+  }
+
+  onMediaConnectionError(payload) {
+    if (payload.peer.id === this.peerId) {
+      this.dispatchEvent(new PeerEvent('media-connection-error'));
     }
   }
 

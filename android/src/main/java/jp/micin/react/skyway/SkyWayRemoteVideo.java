@@ -92,7 +92,11 @@ public class SkyWayRemoteVideo extends Canvas implements SkyWayPeerObserver {
   public void onLocalStreamWillClose(SkyWayPeer peer) {}
 
   @Override
-  public void onMediaConnection(SkyWayPeer peer) {}
+  public void onMediaConnectionOpen(SkyWayPeer peer) {}
+  @Override
+  public void onMediaConnectionClose(SkyWayPeer peer) {}
+  @Override
+  public void onMediaConnectionError(SkyWayPeer peer) {}
 
   @Override
   public void onPeerStatusChange(SkyWayPeer peer) {}

@@ -15,7 +15,9 @@
 -(void)onLocalStreamWillClose:(RNSkyWayPeer *)peer;
 -(void)onRemoteStreamOpen:(RNSkyWayPeer *)peer;
 -(void)onRemoteStreamWillClose:(RNSkyWayPeer *)peer;
--(void)onMediaConnection:(RNSkyWayPeer *)peer;
+-(void)onMediaConnectionOpen:(RNSkyWayPeer *)peer;
+-(void)onMediaConnectionClose:(RNSkyWayPeer *)peer;
+-(void)onMediaConnectionError:(RNSkyWayPeer *)peer;
 -(void)onPeerStatusChange:(RNSkyWayPeer *)peer;
 -(void)onMediaConnectionStatusChange:(RNSkyWayPeer *)peer;
 

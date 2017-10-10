@@ -11,7 +11,9 @@ public interface SkyWayPeerObserver {
   void onLocalStreamWillClose(SkyWayPeer peer);
   void onRemoteStreamOpen(SkyWayPeer peer);
   void onRemoteStreamWillClose(SkyWayPeer peer);
-  void onMediaConnection(SkyWayPeer peer);
+  void onMediaConnectionOpen(SkyWayPeer peer);
+  void onMediaConnectionClose(SkyWayPeer peer);
+  void onMediaConnectionError(SkyWayPeer peer);
   void onPeerStatusChange(SkyWayPeer peer);
   void onMediaConnectionStatusChange(SkyWayPeer peer);
 }

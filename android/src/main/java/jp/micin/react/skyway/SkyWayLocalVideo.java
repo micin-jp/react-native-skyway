@@ -3,6 +3,8 @@ package jp.micin.react.skyway;
 import android.content.Context;
 import android.view.View;
 
+import com.facebook.react.bridge.UiThreadUtil;
+
 import io.skyway.Peer.Browser.Canvas;
 
 public class SkyWayLocalVideo extends Canvas implements SkyWayPeerObserver {
@@ -92,7 +94,12 @@ public class SkyWayLocalVideo extends Canvas implements SkyWayPeerObserver {
   public void onRemoteStreamWillClose(SkyWayPeer peer) {}
 
   @Override
-  public void onMediaConnection(SkyWayPeer peer) {}
+  public void onMediaConnectionOpen(SkyWayPeer peer) {}
+  @Override
+  public void onMediaConnectionClose(SkyWayPeer peer) {}
+  @Override
+  public void onMediaConnectionError(SkyWayPeer peer) {}
+
   @Override
   public void onPeerStatusChange(SkyWayPeer peer) {}
   @Override

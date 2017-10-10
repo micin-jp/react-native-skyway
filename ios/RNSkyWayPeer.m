@@ -26,13 +26,17 @@
 }
 
 - (void)setPeerStatus:(RNSkyWayPeerStatus)status {
-    _peerStatus = status;
-    [self notifyPeerStatusChangeDelegate];
+    if (_peerStatus != status) {
+        _peerStatus = status;
+        [self notifyPeerStatusChangeDelegate];
+    }
 }
 
 - (void)setMediaConnectionStatus:(RNSkyWayMediaConnectionStatus)status {
-    _mediaConnectionStatus = status;
-    [self notifyMediaConnectionStatusChangeDelegate];
+    if (_mediaConnectionStatus != status) {
+        _mediaConnectionStatus = status;
+        [self notifyMediaConnectionStatusChangeDelegate];
+    }
 }
 
 - (void)setOptionsFromDic:(NSDictionary *)dic {
@@ -105,13 +109,15 @@
     [self.peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager close");
 
-        self.peerStatus = RNSkyWayPeerDisconnected;
         [self notifyPeerCloseDelegate];
     }];
     
     [self.peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager disconnected");
 
+        [self disconnect];
+
+        self.peerStatus = RNSkyWayPeerDisconnected;
         [self notifyPeerDisconnectedDelegate];
     }];
 
@@ -129,13 +135,8 @@
         NSLog(@"RNSkyWayPeerManager call");
 
         if (YES == [obj isKindOfClass:[SKWMediaConnection class]]) {
-            if (nil == self.localStream) {
-                [self openLocalStream];
-            }
-            
             self.mediaConnection = (SKWMediaConnection *)obj;
             [self setMediaCallbacks];
-            [self.mediaConnection answer:self.localStream];
             
             [self notifyPeerCallDelegate];
         }
@@ -143,16 +144,19 @@
 }
 
 - (void)disconnect {
-    if (nil == self.peer) {
-        return;
-    }
-    
-    [self unsetPeerCallbacks];
-    [self unsetMediaCallbacks];
-    [self closeLocalStream];
     [self closeRemoteStream];
+    [self closeLocalStream];
+    [self closeMediaConnection];
 
-    [self.peer disconnect];
+    if (self.peer != nil) {
+        [self unsetPeerCallbacks];
+
+        if (![self.peer isDisconnected]) {
+            [self.peer disconnect];
+            [self notifyPeerDisconnectedDelegate];
+        }
+    }
+    self.peerStatus = RNSkyWayPeerDisconnected;
     self.peer = nil;
 }
 
@@ -168,9 +172,25 @@
     [self setMediaCallbacks];
 }
 
+- (void)answer {
+    if (self.peer == nil) {
+        return;
+    }
+    if (self.mediaConnection == nil) {
+        return;
+    }
+    
+    if (self.localStream == nil) {
+        [self openLocalStream];
+    }
+
+    [self.mediaConnection answer:self.localStream];
+}
+
 - (void)hangup {
     [self closeRemoteStream];
-    [self.mediaConnection close];
+    [self closeLocalStream];
+    [self closeMediaConnection];
 }
 
 - (void) openLocalStream {
@@ -232,13 +252,38 @@
             self.mediaConnectionStatus = RNSkyWayMediaConnectionConnected;
             self.remoteStream = (SKWMediaStream *)obj;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyMediaConnectionDelegate];
+                [self notifyMediaConnectionOpenDelegate];
                 [self notifyRemoteStreamOpenDelegate];
             });
-            
         }
     }];
     
+    [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_ERROR callback:^(NSObject* obj) {
+        NSLog(@"RNSkyWayPeerManager mediaConnection error");
+        
+        [self notifyMediaConnectionErrorDelegate];
+    }];
+
+    [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_CLOSE callback:^(NSObject* obj) {
+        NSLog(@"RNSkyWayPeerManager mediaConnection close");
+
+        [self notifyMediaConnectionCloseDelegate];
+    }];
+
+}
+
+- (void)closeMediaConnection {
+    if (self.mediaConnection == nil) {
+        return;
+    };
+    
+    [self unsetPeerCallbacks];
+    if ([self.mediaConnection isOpen]) {
+        [self.mediaConnection close];
+        [self notifyMediaConnectionCloseDelegate];
+    }
+    self.mediaConnectionStatus = RNSkyWayMediaConnectionDisconnected;
+    self.mediaConnection = nil;
 }
 
 - (void)unsetPeerCallbacks {
@@ -365,15 +410,36 @@
     }
 }
 
-- (void) notifyMediaConnectionDelegate {
+- (void) notifyMediaConnectionOpenDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
         if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
-            if ([delegete respondsToSelector:@selector(onMediaConnection:)]) {
-                [delegete onMediaConnection:self];
+            if ([delegete respondsToSelector:@selector(onMediaConnectionOpen:)]) {
+                [delegete onMediaConnectionOpen:self];
             }
         }
     }
 }
+
+- (void) notifyMediaConnectionCloseDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onMediaConnectionClose:)]) {
+                [delegete onMediaConnectionClose:self];
+            }
+        }
+    }
+}
+
+- (void) notifyMediaConnectionErrorDelegate {
+    for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {
+        if ([delegete conformsToProtocol:@protocol(RNSkyWayPeerDelegate)]) {
+            if ([delegete respondsToSelector:@selector(onMediaConnectionError:)]) {
+                [delegete onMediaConnectionError:self];
+            }
+        }
+    }
+}
+
 
 - (void) notifyPeerStatusChangeDelegate {
     for (id<RNSkyWayPeerDelegate> delegete in self.delegates) {

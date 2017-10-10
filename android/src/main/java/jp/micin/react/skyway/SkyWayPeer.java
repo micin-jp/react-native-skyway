@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 
@@ -197,6 +198,8 @@ public class SkyWayPeer {
       public void onCallback(Object object) {
         Log.d(TAG, "Peer OnDisconnected");
 
+        disconnect();
+
         setPeerStatus(SkyWayPeerStatus.Disconnected);
         notifyOnPeerDisconnected();
       }
@@ -230,13 +233,8 @@ public class SkyWayPeer {
           return;
         }
 
-        if (localStream == null) {
-          openLocalStream();
-        }
-
         mediaConnection = (MediaConnection) object;
         setMediaCallbacks();
-        mediaConnection.answer(localStream);
 
         notifyOnPeerCall();
       }
@@ -245,15 +243,20 @@ public class SkyWayPeer {
   }
 
   public void disconnect() {
-    closeMediaConnection();
     closeRemoteStream();
     closeLocalStream();
+    closeMediaConnection();
 
     if (peer != null) {
       unsetPeerCallback();
-      peer.disconnect();
-      peer = null;
+      if (!peer.isDisconnected()) {
+        peer.disconnect();
+        notifyOnPeerDisconnected();
+      }
+
+      setPeerStatus(SkyWayPeerStatus.Disconnected);
     }
+    peer = null;
   }
 
   public void listAllPeers(final Callback callback) {
@@ -293,7 +296,6 @@ public class SkyWayPeer {
       return;
     }
 
-    hangup();
     if (localStream == null) {
       openLocalStream();
     }
@@ -305,7 +307,24 @@ public class SkyWayPeer {
     }
   }
 
+  public void answer() {
+    if (peer == null) {
+      return;
+    }
+    if (mediaConnection == null) {
+      return;
+    }
+
+    if (localStream == null) {
+      openLocalStream();
+    }
+
+    mediaConnection.answer(localStream);
+  }
+
+
   public void hangup() {
+    closeLocalStream();
     closeRemoteStream();
     closeMediaConnection();
   }
@@ -351,10 +370,14 @@ public class SkyWayPeer {
     }
 
     unsetMediaCallbacks();
-    mediaConnection.close();
+    if (mediaConnection.isOpen()) {
+      mediaConnection.close();
+      notifyOnMediaConnectionClose();
+    }
+    setMediaConnectionStatus(SkyWayMediaConnectionStatus.Disconnected);
     mediaConnection = null;
-  }
 
+  }
 
 
   void setMediaCallbacks() {
@@ -364,10 +387,11 @@ public class SkyWayPeer {
       public void onCallback(Object object) {
         Log.d(TAG, "MediaConnection Stream Open");
 
+        closeRemoteStream();
         remoteStream = (MediaStream) object;
 
         setMediaConnectionStatus(SkyWayMediaConnectionStatus.Connected);
-        notifyOnMediaConnection();
+        notifyOnMediaConnectionOpen();
         notifyOnRemoteStreamOpen();
       }
     });
@@ -377,6 +401,8 @@ public class SkyWayPeer {
       public void onCallback(Object object) {
         PeerError error = (PeerError) object;
         Log.d(TAG, "MediaConnection OnError: " + error);
+
+        notifyOnMediaConnectionError();
       }
     });
 
@@ -384,7 +410,11 @@ public class SkyWayPeer {
       @Override
       public void onCallback(Object o) {
         Log.d(TAG, "MediaConnection Close");
-        setMediaConnectionStatus(SkyWayMediaConnectionStatus.Connected);
+
+        closeMediaConnection();
+
+        setMediaConnectionStatus(SkyWayMediaConnectionStatus.Disconnected);
+        notifyOnMediaConnectionClose();
       }
     });
   }
@@ -478,9 +508,21 @@ public class SkyWayPeer {
     }
   }
 
-  private void notifyOnMediaConnection() {
+  private void notifyOnMediaConnectionOpen() {
     for (SkyWayPeerObserver observer: observers) {
-      observer.onMediaConnection(this);
+      observer.onMediaConnectionOpen(this);
+    }
+  }
+
+  private void notifyOnMediaConnectionClose() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onMediaConnectionClose(this);
+    }
+  }
+
+  private void notifyOnMediaConnectionError() {
+    for (SkyWayPeerObserver observer: observers) {
+      observer.onMediaConnectionError(this);
     }
   }
 

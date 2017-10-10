@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
@@ -47,11 +48,17 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
 
   @ReactMethod
   public void dispose(String peerId) {
-    SkyWayPeer peer = peers.get(peerId);
+    final SkyWayPeer peer = peers.get(peerId);
+    final SkyWayPeerManagerModule self = this;
 
     if (peer != null) {
-      peer.dispose();
-      peer.removeObserver(this);
+      UiThreadUtil.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          peer.dispose();
+          peer.removeObserver(self);
+        }
+      });
     }
   }
 
@@ -66,10 +73,15 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
 
   @ReactMethod
   public void diconnect(String peerId) {
-    SkyWayPeer peer = peers.get(peerId);
+    final SkyWayPeer peer = peers.get(peerId);
 
     if (peer != null) {
-      peer.disconnect();
+      UiThreadUtil.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          peer.disconnect();
+        }
+      });
     }
   }
 
@@ -83,22 +95,45 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void call(String peerId, String targetPeerId) {
-    SkyWayPeer peer = peers.get(peerId);
+  public void call(String peerId, final String targetPeerId) {
+    final SkyWayPeer peer = peers.get(peerId);
 
     if (peer != null) {
-      peer.call(targetPeerId);
+      UiThreadUtil.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          peer.call(targetPeerId);
+        }
+      });
+    }
+  }
+
+  @ReactMethod
+  public void answer(String peerId) {
+    final SkyWayPeer peer = peers.get(peerId);
+
+    if (peer != null) {
+      UiThreadUtil.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          peer.answer();
+        }
+      });
     }
   }
 
   @ReactMethod
   public void hangup(String peerId) {
-    SkyWayPeer peer = peers.get(peerId);
+    final SkyWayPeer peer = peers.get(peerId);
 
     if (peer != null) {
-      peer.hangup();
+      UiThreadUtil.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          peer.hangup();
+        }
+      });
     }
-
   }
 
   @Override
@@ -161,13 +196,31 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
   public void onRemoteStreamWillClose(SkyWayPeer peer) {}
 
   @Override
-  public void onMediaConnection(SkyWayPeer peer) {
+  public void onMediaConnectionOpen(SkyWayPeer peer) {
     WritableMap peerParam = Arguments.createMap();
     peerParam.putString("id", peer.getPeer().identity());
     WritableMap params = Arguments.createMap();
     params.putMap("peer", peerParam);
 
-    sendEvent("SkyWayPeerMediaConnection", params);
+    sendEvent("SkyWayMediaConnectionOpen", params);
+  }
+  @Override
+  public void onMediaConnectionClose(SkyWayPeer peer) {
+    WritableMap peerParam = Arguments.createMap();
+    peerParam.putString("id", peer.getPeer().identity());
+    WritableMap params = Arguments.createMap();
+    params.putMap("peer", peerParam);
+
+    sendEvent("SkyWayMediaConnectionClose", params);
+  }
+  @Override
+  public void onMediaConnectionError(SkyWayPeer peer) {
+    WritableMap peerParam = Arguments.createMap();
+    peerParam.putString("id", peer.getPeer().identity());
+    WritableMap params = Arguments.createMap();
+    params.putMap("peer", peerParam);
+
+    sendEvent("SkyWayMediaConnectionError", params);
   }
 
   @Override
@@ -178,7 +231,7 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
     params.putMap("peer", peerParam);
     params.putInt("status", peer.getPeerStatus().getInt());
 
-    sendEvent("SkyWayPeerPeerStatusChange", params);
+    sendEvent("SkyWayPeerStatusChange", params);
   }
 
   @Override
@@ -189,7 +242,7 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
     params.putMap("peer", peerParam);
     params.putInt("status", peer.getMediaConnectionStatus().getInt());
 
-    sendEvent("SkyWayPeerMediaConnectionStatusChange", params);
+    sendEvent("SkyWayMediaConnectionStatusChange", params);
   }
 
   private void sendEvent(String eventName, WritableMap params) {
