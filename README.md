@@ -1,42 +1,42 @@
 
 # react-native-skyway
 
-## Getting started
+## Instrallation
 
-`$ npm install react-native-skyway --save`
+```
+npm install react-native-skyway --save
+react-native link react-native-skyway
+```
 
-### Mostly automatic installation
+### iOS
 
-`$ react-native link react-native-skyway`
+#### Installing SkyWay Package
 
-### Manual installation
+Install SkyWay package via CocoaPods.
 
+```
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '9.0'
 
-#### iOS
+target 'example' do
+  pod 'SkyWay'
+  inherit! :search_paths
+end
+```
 
-1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-skyway` and add `RNSkyWay.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNSkyWay.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
+### Android
 
-#### Android
+#### Installing SkyWay package
 
-1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import com.reactlibrary.RNSkyWayPackage;` to the imports at the top of the file
-  - Add `new RNSkyWayPackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':react-native-skyway'
-  	project(':react-native-skyway').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-skyway/android')
-  	```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
-      compile project(':react-native-skyway')
-  	```
+Add SkyWay aar package manually. Download the SDK from [SkyWay  Developers site](https://webrtc.ecl.ntt.com/en/android-sdk.html).
+
+1. Open Android Studio.
+2. Select `Open Module Settings` from the project view.
+3. Add the downloaded SDK(`skyway.aar`) as a new module.
 
 ## Usage
 ```javascript
- 
+
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import SkyWay from 'react-native-skyway';
@@ -81,7 +81,7 @@ class AppComponent extends Component {
   }
 
   render() {
-    return <View style={style.container}>
+    return <View style={styles.container}>
       <SkyWay.LocalVideo style={styles.localVideo} peer={this.state.peer} />
       <SkyWay.RemoteVideo style={styles.remoteVideo} peer={this.state.peer} />
     </View>
@@ -93,5 +93,3 @@ const styles = StyleSheet.create({
 });
 
 ```
-
-
