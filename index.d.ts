@@ -5,9 +5,35 @@ declare namespace SkyWay {
   export type PeerID = string;
 
   export class PeerOptions {
+    key?: string;
+    domain?: string;
+    host?: string;
+    port?: number;
+    secure?: boolean;
+    turn?: boolean;
+    credential?: PeerCredential;
+  }
+
+  export class PeerCredential {
+    ttl?: number;
+    timestamp?: number;
+    authToken: string;
   }
 
   export class MediaConstraints {
+    cameraPosition?: CameraPosition;
+    maxWidth?: number;
+    minWidth?: number;
+    maxHeight?: number;
+    minHeight?: number;
+    maxFrameRate?: number;
+    minFrameRate?: number;
+  }
+
+  export enum CameraPosition {
+    Unspecified = 0,
+    Back = 1,
+    Front = 2,
   }
 
   export class PeerEvent extends Event {
@@ -24,7 +50,7 @@ declare namespace SkyWay {
   }
 
   export class Peer extends EventTarget {
-    constructor(peerId: PeerID, options: PeerOptions, constraints: MediaConstraints);
+    constructor(peerId: PeerID, options?: PeerOptions, constraints?: MediaConstraints);
     get peerId(): PeerID;
     get options(): PeerOptions;
     get constraints(): MediaConstraints;
@@ -40,18 +66,20 @@ declare namespace SkyWay {
   }
 
   interface LocalVideoProps {
-    peer: Peer
-    zOrderMediaOverlay: boolean,
-    zOrderOnTop: boolean,
+    peer?: Peer | null;
+    zOrderMediaOverlay?: boolean;
+    zOrderOnTop?: boolean;
+    style?: any;
   }
 
   export class LocalVideo extends Component<LocalVideoProps> {
   }
 
   interface RemoteVideoProps {
-    peer: Peer
-    zOrderMediaOverlay: boolean,
-    zOrderOnTop: boolean,
+    peer?: Peer | null;
+    zOrderMediaOverlay?: boolean,
+    zOrderOnTop?: boolean,
+    style?: any;
   }
 
   export class RemoteVideo extends Component<RemoteVideoProps> {
