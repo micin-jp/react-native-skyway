@@ -303,7 +303,7 @@
         return;
     };
     
-    [self unsetPeerCallbacks];
+    [self unsetMediaCallbacks];
     if ([self.mediaConnection isOpen]) {
         [self.mediaConnection close];
         [self notifyMediaConnectionCloseDelegate];
