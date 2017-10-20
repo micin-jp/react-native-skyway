@@ -111,13 +111,17 @@
         NSLog(@"RNSkyWayPeerManager open");
             
         weakSelf.peerStatus = RNSkyWayPeerConnected;
-        [weakSelf notifyPeerOpenDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyPeerOpenDelegate];
+        });
     }];
 
     [self.peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager close");
 
-        [weakSelf notifyPeerCloseDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyPeerCloseDelegate];
+        });
     }];
     
     [self.peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj) {
@@ -126,7 +130,9 @@
         [weakSelf disconnect];
 
         weakSelf.peerStatus = RNSkyWayPeerDisconnected;
-        [weakSelf notifyPeerDisconnectedDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyPeerDisconnectedDelegate];
+        });
     }];
 
 
@@ -136,7 +142,9 @@
         SKWPeerError* error = (SKWPeerError*)obj;
         NSLog(@"%@",error);
         
-        [weakSelf notifyPeerErrorDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyPeerErrorDelegate];
+        });
     }];
     
     [self.peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* obj) {
@@ -146,7 +154,9 @@
             weakSelf.mediaConnection = (SKWMediaConnection *)obj;
             [weakSelf setMediaCallbacks];
             
-            [weakSelf notifyPeerCallDelegate];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf notifyPeerCallDelegate];
+            });
         }
     }];
 }
@@ -273,13 +283,17 @@
     [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_ERROR callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager mediaConnection error");
         
-        [weakSelf notifyMediaConnectionErrorDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyMediaConnectionErrorDelegate];
+        });
     }];
 
     [_mediaConnection on:SKW_MEDIACONNECTION_EVENT_CLOSE callback:^(NSObject* obj) {
         NSLog(@"RNSkyWayPeerManager mediaConnection close");
 
-        [weakSelf notifyMediaConnectionCloseDelegate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf notifyMediaConnectionCloseDelegate];
+        });
     }];
 
 }
