@@ -156,6 +156,21 @@ public class SkyWayPeerManagerModule extends ReactContextBaseJavaModule implemen
     });
   }
 
+  @ReactMethod
+  public void switchCamera(final String peerId) {
+    UiThreadUtil.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        SkyWayPeer peer = peers.get(peerId);
+        if (peer == null) {
+          return;
+        }
+
+        peer.switchCamera();
+      }
+    });
+  }
+
   @Override
   public void onPeerOpen(SkyWayPeer peer) {
     WritableMap peerParam = Arguments.createMap();

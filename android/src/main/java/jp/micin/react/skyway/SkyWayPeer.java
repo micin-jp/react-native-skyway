@@ -337,6 +337,17 @@ public class SkyWayPeer {
     closeMediaConnection();
   }
 
+  public void switchCamera() {
+    if (peer == null) {
+      return;
+    }
+    if (localStream == null) {
+      return;
+    }
+
+    localStream.switchCamera();
+  }
+
   private void openLocalStream() {
     if (peer == null) {
       return;
