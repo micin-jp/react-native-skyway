@@ -90,6 +90,13 @@ RCT_EXPORT_METHOD(hangup:(nonnull NSString *)peerId)
     [self.peers[peerId] hangup];
 }
 
+RCT_EXPORT_METHOD(switchCamera:(nonnull NSString *)peerId)
+{
+    NSLog(@"RNSkyWayPeerManager switchCamera");
+
+    [self.peers[peerId] switchCamera];
+}
+
 RCT_EXPORT_MODULE(SkyWayPeerManager);
 
 - (dispatch_queue_t)methodQueue

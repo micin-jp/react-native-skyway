@@ -212,6 +212,28 @@
     [self closeMediaConnection];
 }
 
+- (void)switchCamera {
+    if (self.peer == nil) {
+        return;
+    }
+    if (self.localStream == nil) {
+        return;
+    }
+
+    //BOOL result = [self.localStream switchCamera];
+    BOOL result = NO;
+    if ([self.localStream getCameraPosition] == SKW_CAMERA_POSITION_BACK) {
+        result = [self.localStream setCameraPosition:SKW_CAMERA_POSITION_FRONT];
+    } else if ([self.localStream getCameraPosition] == SKW_CAMERA_POSITION_FRONT) {
+        result = [self.localStream setCameraPosition:SKW_CAMERA_POSITION_BACK];
+    }
+    if (result) {
+        NSLog(@"RNSkyWayPeerManager switchCamera ok");
+    } else {
+        NSLog(@"RNSkyWayPeerManager switchCamera ng");
+    }
+}
+
 - (void) openLocalStream {
     if (self.peer == nil) {
         return;

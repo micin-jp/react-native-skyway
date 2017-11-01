@@ -147,6 +147,14 @@ export class Peer extends EventTarget {
     SkyWayPeerManager.hangup(this.peerId);
   }
 
+  switchCamera() {
+    if (this.disposed) {
+      return;
+    }
+
+    SkyWayPeerManager.switchCamera(this.peerId);
+  }
+
   onPeerOpen(payload) {
     if (payload.peer.id === this.peerId) {
       this.dispatchEvent(new PeerEvent('peer-open'));
