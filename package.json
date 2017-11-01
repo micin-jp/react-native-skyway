@@ -1,6 +1,6 @@
 {
   "name": "react-native-skyway",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React Native plugin for SkyWay",
   "homepage": "https://github.com/micin-jp/react-native-skyway",
   "main": "index.js",
