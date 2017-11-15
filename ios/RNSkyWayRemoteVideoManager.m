@@ -26,6 +26,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
+    self.remoteView.transform = CGAffineTransformIdentity;
     self.remoteView.frame = self.bounds;
     
     CGFloat width = _videoSize.width, height = _videoSize.height;
