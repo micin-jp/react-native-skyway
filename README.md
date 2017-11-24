@@ -1,7 +1,7 @@
 
 # react-native-skyway
 
-## Instrallation
+## Installation
 
 ```
 npm install react-native-skyway --save
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
 
 ### Authorizing Device Access
 
-You should checking device permission(camera, microphone) before starting video call.
+You should checking device permissions(camera, microphone) before starting video call.
 
 Use [react-native-permissions](https://github.com/yonahforst/react-native-permissions)
 
