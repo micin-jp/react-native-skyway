@@ -4,7 +4,7 @@
 ## Installation
 
 ```
-npm install react-native-skyway --save
+npm install git+ssh://git@github.com/micin-jp/react-native-skyway.git#v0.1.1 --save
 react-native link react-native-skyway
 ```
 
